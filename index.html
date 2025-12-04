@@ -194,6 +194,44 @@
             font-size: 14px;
             line-height: 1.6;
         }
+
+            .result-section {
+                margin-bottom: 20px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 8px;
+                border-left: 4px solid #667eea;
+            }
+
+            .result-section h3 {
+                margin: 0 0 12px 0;
+                font-size: 16px;
+                color: #667eea;
+            }
+
+            .metric-item {
+                padding: 6px 0;
+                font-size: 14px;
+                color: #333;
+                line-height: 1.6;
+            }
+
+            .warning-item {
+                padding: 6px 0;
+                color: #d97706;
+                font-size: 14px;
+            }
+
+            .recommendations-list {
+                margin: 8px 0 0 0;
+                padding-left: 20px;
+            }
+
+            .recommendations-list li {
+                padding: 4px 0;
+                font-size: 14px;
+                color: #555;
+            }
     </style>
 </head>
 <body>
@@ -328,70 +366,51 @@
             const level = getStrengthLevel(score);
             const issues = findIssues(password);
             
-            let result = `PASSWORD ANALYSIS RESULTS\
-`;
-            result += `${'='.repeat(50)}\
-\
-`;
-            result += `Length: ${password.length} characters\
-`;
-            result += `Entropy: ${entropy} bits\
-\
-`;
-            result += `CHARACTER DIVERSITY: ${diversityCount}/4\
-`;
-            result += ` ${diversity.lowercase ? '✓' : '✗'} Lowercase letters (a-z)\
-`;
-            result += ` ${diversity.uppercase ? '✓' : '✗'} Uppercase letters (A-Z)\
-`;
-            result += ` ${diversity.digits ? '✓' : '✗'} Digits (0-9)\
-`;
-            result += ` ${diversity.special ? '✓' : '✗'} Special characters\
-\
-`;
-            result += `STRENGTH SCORE: ${score}/100\
-`;
-            result += `STRENGTH LEVEL: ${level}\
-\
-`;
-            
+let result = `<div class="result-section">
+                <h3>📊 Analysis Metrics</h3>
+                <div class="metric-item"><strong>Length:</strong> ${password.length} characters</div>
+                <div class="metric-item"><strong>Entropy:</strong> ${entropy} bits</div>
+                <div class="metric-item"><strong>Character Diversity:</strong> ${diversityCount}/4</div>
+                <div class="metric-item">${diversity.lowercase ? '✓' : 'X'} Lowercase letters (a-z)</div>
+                <div class="metric-item">${diversity.uppercase ? '✓' : 'X'} Uppercase letters (A-Z)</div>
+                <div class="metric-item">${diversity.digits ? '✓' : 'X'} Digits (0-9)</div>
+                <div class="metric-item">${diversity.special ? '✓' : 'X'} Special characters (!@#$%^&*)</div>
+                <div class="metric-item"><strong>Strength Score:</strong> ${score}/100</div>
+                <div class="metric-item"><strong>Strength Level:</strong> ${level}</div>
+            </div>`;`;
+
             if (issues.length > 0) {
-                result += `WEAK PATTERNS DETECTED:\
-`;
+                result += `<div class="result-section">
+                    <h3>⚠️ Weak Patterns Detected</h3>`;
                 issues.forEach(issue => {
-                    result += ` • ${issue}\
-`;
+                    result += `<div class="warning-item">• ${issue}</div>`;
                 });
-                result += `\
-`;
+                result += `</div>`;
             }
-            
-            result += `RECOMMENDATIONS:\
-`;
+
+            result += `<div class="result-section">
+                <h3>💡 Recommendations</h3>
+                <ul class="recommendations-list">`;
             if (password.length < 12) {
-                result += ` • Increase length to 12+ characters\
-`;
+                result += `<li>Increase length to 12+ characters</li>`;
             }
             if (!diversity.lowercase) {
-                result += ` • Add lowercase letters (a-z)\
-`;
+                result += `<li>Add lowercase letters (a-z)</li>`;
             }
             if (!diversity.uppercase) {
-                result += ` • Add uppercase letters (A-Z)\
-`;
+                result += `<li>Add uppercase letters (A-Z)</li>`;
             }
             if (!diversity.digits) {
-                result += ` • Add digits (0-9)\
-`;
+                result += `<li>Add digits (0-9)</li>`;
             }
             if (!diversity.special) {
-                result += ` • Add special characters (!@#$%^&*)\
-`;
+                result += `<li>Add special characters (!@#$%^&*)</li>`;
             }
             if (issues.length === 0 && password.length >= 12 && diversityCount === 4) {
-                result += ` • Excellent! Your password is strong.\
-`;
+                result += `<li>✅ Excellent! Your password is strong.</li>`;
             }
+            result += `</ul></div>`;            
+            
             
             return result;
         }
