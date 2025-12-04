@@ -328,44 +328,69 @@
             const level = getStrengthLevel(score);
             const issues = findIssues(password);
             
-            let result = `PASSWORD ANALYSIS RESULTS\\n`;
-            result += `${'='.repeat(50)}\\n\\n`;
-            result += `Length: ${password.length} characters\\n`;
-            result += `Entropy: ${entropy} bits\\n\\n`;
-            result += `CHARACTER DIVERSITY: ${diversityCount}/4\\n`;
-            result += ` ${diversity.lowercase ? '✓' : '✗'} Lowercase letters (a-z)\\n`;
-            result += ` ${diversity.uppercase ? '✓' : '✗'} Uppercase letters (A-Z)\\n`;
-            result += ` ${diversity.digits ? '✓' : '✗'} Digits (0-9)\\n`;
-            result += ` ${diversity.special ? '✓' : '✗'} Special characters\\n\\n`;
-            result += `STRENGTH SCORE: ${score}/100\\n`;
-            result += `STRENGTH LEVEL: ${level}\\n\\n`;
+            let result = `PASSWORD ANALYSIS RESULTS\
+`;
+            result += `${'='.repeat(50)}\
+\
+`;
+            result += `Length: ${password.length} characters\
+`;
+            result += `Entropy: ${entropy} bits\
+\
+`;
+            result += `CHARACTER DIVERSITY: ${diversityCount}/4\
+`;
+            result += ` ${diversity.lowercase ? '✓' : '✗'} Lowercase letters (a-z)\
+`;
+            result += ` ${diversity.uppercase ? '✓' : '✗'} Uppercase letters (A-Z)\
+`;
+            result += ` ${diversity.digits ? '✓' : '✗'} Digits (0-9)\
+`;
+            result += ` ${diversity.special ? '✓' : '✗'} Special characters\
+\
+`;
+            result += `STRENGTH SCORE: ${score}/100\
+`;
+            result += `STRENGTH LEVEL: ${level}\
+\
+`;
             
             if (issues.length > 0) {
-                result += `WEAK PATTERNS DETECTED:\\n`;
+                result += `WEAK PATTERNS DETECTED:\
+`;
                 issues.forEach(issue => {
-                    result += ` • ${issue}\\n`;
+                    result += ` • ${issue}\
+`;
                 });
-                result += `\\n`;
+                result += `\
+`;
             }
             
-            result += `RECOMMENDATIONS:\\n`;
+            result += `RECOMMENDATIONS:\
+`;
             if (password.length < 12) {
-                result += ` • Increase length to 12+ characters\\n`;
+                result += ` • Increase length to 12+ characters\
+`;
             }
             if (!diversity.lowercase) {
-                result += ` • Add lowercase letters (a-z)\\n`;
+                result += ` • Add lowercase letters (a-z)\
+`;
             }
             if (!diversity.uppercase) {
-                result += ` • Add uppercase letters (A-Z)\\n`;
+                result += ` • Add uppercase letters (A-Z)\
+`;
             }
             if (!diversity.digits) {
-                result += ` • Add digits (0-9)\\n`;
+                result += ` • Add digits (0-9)\
+`;
             }
             if (!diversity.special) {
-                result += ` • Add special characters (!@#$%^&*)\\n`;
+                result += ` • Add special characters (!@#$%^&*)\
+`;
             }
             if (issues.length === 0 && password.length >= 12 && diversityCount === 4) {
-                result += ` • Excellent! Your password is strong.\\n`;
+                result += ` • Excellent! Your password is strong.\
+`;
             }
             
             return result;
