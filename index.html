@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Password Strength Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .card h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .card > p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .analyze-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .instructions {
+            color: #999;
+            font-size: 12px;
+            margin-top: 20px;
+            font-style: italic;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-content h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .modal-content p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        #passwordInput {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 20px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        #passwordInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cancel-btn {
+            background: #ddd;
+            color: #333;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: bold;
+        }
+        
+        .cancel-btn:hover {
+            background: #ccc;
+        }
+        
+        .results-modal {
+            max-width: 600px;
+        }
+        
+        #resultsContent {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            color: #333;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🔐 Password Strength Analyzer</h1>
+            <p>Analyze your password strength in real-time</p>
+            <button class="analyze-btn" onclick="promptPassword()">Analyze Password</button>
+            <p class="instructions">Click to enter a password and get instant analysis</p>
+        </div>
+    </div>
+
+    <!-- Modal for password input -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Enter Password</h2>
+            <p>Password will not be stored</p>
+            <input type="password" id="passwordInput" placeholder="Enter password" />
+            <div class="modal-buttons">
+                <button class="analyze-btn" onclick="analyzePassword()">Analyze</button>
+                <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for results -->
+    <div id="resultsModal" class="modal">
+        <div class="modal-content results-modal">
+            <span class="close" onclick="closeResults()">&times;</span>
+            <h2>Analysis Results</h2>
+            <div id="resultsContent"></div>
+            <button class="analyze-btn" onclick="closeResults()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        function calculateEntropy(password) {
+            let charSet = 0;
+            if (/[a-z]/.test(password)) charSet += 26;
+            if (/[A-Z]/.test(password)) charSet += 26;
+            if (/[0-9]/.test(password)) charSet += 10;
+            if (/[!@#$%^&*()_+\-=\[\]{};:'"<>,.?\/]/.test(password)) charSet += 32;
+            
+            if (charSet === 0) return 0;
+            return Math.round(Math.log2(Math.pow(charSet, password.length)) * 100) / 100;
+        }
+
+        function checkDiversity(password) {
+            return {
+                lowercase: /[a-z]/.test(password),
+                uppercase: /[A-Z]/.test(password),
+                digits: /[0-9]/.test(password),
+                special: /[!@#$%^&*()_+\-=\[\]{};:'"<>,.?\/]/.test(password)
+            };
+        }
+
+        function findIssues(password) {
+            let issues = [];
+            const patterns = ['qwerty', 'asdfgh', 'zxcvbn', '123456', 'abc123', 'password', 'admin', 'letmein', 'welcome', '111111'];
+            
+            for (let p of patterns) {
+                if (password.toLowerCase().includes(p)) {
+                    issues.push(`Contains keyboard pattern: ${p}`);
+                }
+            }
+            
+            if (/(.)\\1\\1/.test(password)) {
+                issues.push('Contains repeated characters (3+ in a row)');
+            }
+            
+            if (/(012|123|234|345|456|567|678|789|890)/.test(password)) {
+                issues.push('Contains sequential numbers');
+            }
+            
+            return issues;
+        }
+
+        function scorePassword(password) {
+            let score = 0;
+            
+            // Length score
+            if (password.length >= 8) {
+                score += Math.min(30, password.length * 2);
+            } else if (password.length >= 6) {
+                score += 15;
+            } else {
+                score += 5;
+            }
+            
+            // Diversity score
+            const diversity = checkDiversity(password);
+            const diversityCount = Object.values(diversity).filter(v => v).length;
+            score += diversityCount * 10;
+            
+            // Entropy score
+            const entropy = calculateEntropy(password);
+            if (entropy >= 50) score += 30;
+            else if (entropy >= 35) score += 20;
+            else score += 10;
+            
+            // Deduct for issues
+            score -= findIssues(password).length * 5;
+            
+            return Math.max(0, Math.min(100, score));
+        }
+
+        function getStrengthLevel(score) {
+            const levels = ['Very Weak', 'Weak', 'Moderate', 'Strong', 'Very Strong'];
+            const index = Math.floor(Math.min(score, 99) / 20);
+            return levels[index];
+        }
+
+        function getStrengthColor(score) {
+            if (score >= 80) return '#27ae60'; // Green
+            if (score >= 60) return '#3498db'; // Blue
+            if (score >= 40) return '#f39c12'; // Orange
+            if (score >= 20) return '#e67e22'; // Dark Orange
+            return '#e74c3c'; // Red
+        }
+
+        function analyzePasswordFull(password) {
+            if (!password) {
+                alert('Password cannot be empty!');
+                return;
+            }
+            
+            const entropy = calculateEntropy(password);
+            const diversity = checkDiversity(password);
+            const diversityCount = Object.values(diversity).filter(v => v).length;
+            const score = scorePassword(password);
+            const level = getStrengthLevel(score);
+            const issues = findIssues(password);
+            
+            let result = `PASSWORD ANALYSIS RESULTS\\n`;
+            result += `${'='.repeat(50)}\\n\\n`;
+            result += `Length: ${password.length} characters\\n`;
+            result += `Entropy: ${entropy} bits\\n\\n`;
+            result += `CHARACTER DIVERSITY: ${diversityCount}/4\\n`;
+            result += ` ${diversity.lowercase ? '✓' : '✗'} Lowercase letters (a-z)\\n`;
+            result += ` ${diversity.uppercase ? '✓' : '✗'} Uppercase letters (A-Z)\\n`;
+            result += ` ${diversity.digits ? '✓' : '✗'} Digits (0-9)\\n`;
+            result += ` ${diversity.special ? '✓' : '✗'} Special characters\\n\\n`;
+            result += `STRENGTH SCORE: ${score}/100\\n`;
+            result += `STRENGTH LEVEL: ${level}\\n\\n`;
+            
+            if (issues.length > 0) {
+                result += `WEAK PATTERNS DETECTED:\\n`;
+                issues.forEach(issue => {
+                    result += ` • ${issue}\\n`;
+                });
+                result += `\\n`;
+            }
+            
+            result += `RECOMMENDATIONS:\\n`;
+            if (password.length < 12) {
+                result += ` • Increase length to 12+ characters\\n`;
+            }
+            if (!diversity.lowercase) {
+                result += ` • Add lowercase letters (a-z)\\n`;
+            }
+            if (!diversity.uppercase) {
+                result += ` • Add uppercase letters (A-Z)\\n`;
+            }
+            if (!diversity.digits) {
+                result += ` • Add digits (0-9)\\n`;
+            }
+            if (!diversity.special) {
+                result += ` • Add special characters (!@#$%^&*)\\n`;
+            }
+            if (issues.length === 0 && password.length >= 12 && diversityCount === 4) {
+                result += ` • Excellent! Your password is strong.\\n`;
+            }
+            
+            return result;
+        }
+
+        function promptPassword() {
+            document.getElementById('passwordModal').style.display = 'block';
+            document.getElementById('passwordInput').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+        }
+
+        function analyzePassword() {
+            const password = document.getElementById('passwordInput').value;
+            const result = analyzePasswordFull(password);
+            
+            if (result) {
+                document.getElementById('resultsContent').textContent = result;
+                document.getElementById('passwordModal').style.display = 'none';
+                document.getElementById('resultsModal').style.display = 'block';
+            }
+        }
+
+        function closeResults() {
+            document.getElementById('resultsModal').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            let passwordModal = document.getElementById('passwordModal');
+            let resultsModal = document.getElementById('resultsModal');
+            
+            if (event.target === passwordModal) {
+                passwordModal.style.display = 'none';
+            }
+            if (event.target === resultsModal) {
+                resultsModal.style.display = 'none';
+            }
+        }
+
+        // Allow Enter key to analyze
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && document.getElementById('passwordModal').style.display === 'block') {
+                analyzePassword();
+            }
+        });
+    </script>
+</body>
+</html>
