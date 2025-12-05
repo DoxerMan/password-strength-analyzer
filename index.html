@@ -377,7 +377,7 @@ let result = `<div class="result-section">
                 <div class="metric-item">${diversity.special ? '✓' : 'X'} Special characters (!@#$%^&*)</div>
                 <div class="metric-item"><strong>Strength Score:</strong> ${score}/100</div>
                 <div class="metric-item"><strong>Strength Level:</strong> ${level}</div>
-            </div>`;`;
+            </div>`;
 
             if (issues.length > 0) {
                 result += `<div class="result-section">
@@ -430,7 +430,7 @@ let result = `<div class="result-section">
             const result = analyzePasswordFull(password);
             
             if (result) {
-                document.getElementById('resultsContent').textContent = result;
+                document.getElementById('resultsContent').innerHTML = result;
                 document.getElementById('passwordModal').style.display = 'none';
                 document.getElementById('resultsModal').style.display = 'block';
             }
