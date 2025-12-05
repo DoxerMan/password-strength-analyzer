@@ -1,2 +1,2 @@
-# password-strength-analyzer
-A real-time password strength analyzer with entropy calculation and detailed security metrics
+# Password Strength Analyzer
+A real-time password strength analyzer with entropy calculation and detailed security metrics.
